@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TotalLine Garage Door Invoice</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root {
+      --brand-blue: #0066cc;
+      --pass-green: #2e7d32;
+      --fail-red: #c62828;
+      --na-gray: #9e9e9e;
+      --border-light: #e0e0e0;
+      --note-border: #bbdefb;
+      --bg-light: #fafafa;
+      --text-main: #212121;
+      --text-muted: #616161;
+    }
+
+    .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--brand-blue);
+    margin-bottom: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+      color: var(--text-main);
+    }
+
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1rem 2rem;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0 0.75rem;
+      background: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-img {
+      height: 52px;
+      width: auto;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--brand-blue);
+    }
+
+    .header-right {
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .header-divider {
+      height: 1px;
+      background: var(--border-light);
+      margin-bottom: 0.75rem;
+    }
+
+    .job-info {
+      background: #f9fafc;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #d0d7de;
+    }
+
+    .job-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 1rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .info-grid.three-col {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .info-grid.two-col {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .info-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .info-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .info-input {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.85rem;
+      background: #ffffff;
+    }
+
+    .section {
+      padding: 0.4rem 0 0.4rem;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 0.4rem;
+    }
+
+    .section-band {
+      background: #eef6ff;
+      border-left: 4px solid #0066cc;
+      padding: 0.6rem 0.8rem;
+      margin: 1rem 0 0.6rem;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .section-band-title,
+    .section-status-pill {
+      pointer-events: auto;
+    }
+
+    .section-band-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #003f80;
+    }
+
+
+    .item-row-horizontal {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr 1.2fr;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px dashed #e5e7eb;
+      align-items: start;
+    }
+
+    .item-label {
+      font-size: 0.88rem;
+    }
+
+    .status-group {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .status-option {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .status-circle {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #bdbdbd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      transition: 0.15s;
+    }
+
+    .status-circle.pass.selected {
+      border-color: var(--pass-green);
+      background: var(--pass-green);
+    }
+
+    .status-circle.fail.selected {
+      border-color: var(--fail-red);
+      background: var(--fail-red);
+    }
+
+    .status-circle.na.selected {
+      border-color: var(--na-gray);
+      background: var(--na-gray);
+    }
+
+    .status-circle-inner {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .note-right textarea {
+      width: 100%;
+      min-height: 40px;
+      resize: vertical;
+      border-radius: 6px;
+      border: 1px solid var(--note-border);
+      padding: 0.35rem 0.45rem;
+      font-size: 0.82rem;
+      background: #f7fbff;
+    }
+
+    .signatures {
+      margin-top: 1.5rem;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--border-light);
+    }
+
+    .signatures-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .signature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .signature-block {
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 0.5rem;
+      background: var(--bg-light);
+    }
+
+    .signature-label {
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+
+    canvas.signature-pad {
+      width: 100%;
+      height: 140px;
+      border-radius: 6px;
+      border: 1px dashed #bdbdbd;
+      background: #ffffff;
+      touch-action: none;
+    }
+
+    .small-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      background: #e0e0e0;
+      color: #424242;
+      margin-top: 0.35rem;
+    }
+
+    .actions {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      padding-bottom: 1.5rem;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 0.55rem 1.3rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--brand-blue);
+      color: #ffffff;
+    }
+
+    .btn-secondary {
+      background: #eeeeee;
+      color: #424242;
+    }
+
+    @media (max-width: 600px) {
+      .item-row-horizontal {
+        grid-template-columns: 1fr;
+      }
+      .info-grid.three-col,
+      .info-grid.two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .header-company {
+    font-size: 14px;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .company-line {
+    font-weight: 500;
+  }
+
+.item-row {
+  display: grid;
+  grid-template-columns: 2fr 0.6fr 0.8fr 0.8fr 40px;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.item-desc {
+  width: 100%;
+  min-height: 50px;
+  padding: 8px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+}
+
+.item-qty,
+.item-unit,
+.item-ext {
+  width: 100%;
+  height: 50px;
+  padding: 8px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.item-ext {
+  background: #f3f3f3;
+  font-weight: bold;
+}
+
+.item-remove {
+  background: none;
+  border: none;
+  color: #d11a1a;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.item-unit {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  caret-color: auto !important;
+}
+
+
+.add-row-btn {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+ .quote-disclaimer {
+  margin-top: 20px;
+  font-size: 14px;
+  font-style: italic;
+  color: #444;
+}
+  
+.quote-total-row {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 2px solid #ccc;
+  display: flex;
+  justify-content: flex-end;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.quote-total-label {
+  margin-right: 10px;
+}
+
+.quote-total-value {
+  min-width: 120px;
+  text-align: right;
+}
+
+.no-print {
+  display: none !important;
+}
+
+  </style>
+</head>
+<body>
+  <div class="app" id="appRoot">
+   <!-- PDF CAPTURE AREA START -->
+<div id="pdfCaptureArea">
+  <div class="header">
+  <div class="header-left">
+<img src="https://raw.githubusercontent.com/chaficsm1/totalLine_Garage/main/garage.png"
+     class="logo-img"
+     crossorigin="anonymous">
+    <div class="header-title">TotalLine Garage Door Invoice</div>
+  </div>
+
+  <div class="header-right">
+    <div class="header-company">
+      <div class="company-line">(913) 687-8382</div>
+      <div class="company-line">a2zproservices@gmail.com</div>
+      <div id="quoteDate" class="company-line"></div>
+    </div>
+
+  </div>
+</div>
+
+  <div class="header-divider"></div>
+
+<!-- start jobInfoPage -->
+  <div id="jobInfoPage">
+  <div class="job-info">
+    <div class="job-header">
+      <h3>Job Information</h3>
+    </div>
+
+    <!-- Customer Detailed Address -->
+    <div class="info-grid three-col">
+      <div class="info-field">
+        <label class="info-label">Customer Name</label>
+        <input id="custName" class="info-input" />
+      </div>
+      <div class="info-field">
+        <label class="info-label">Customer Phone</label>
+        <input id="custPhone" class="info-input" />
+      </div>
+      <div class="info-field">
+        <label class="info-label">Customer Email</label>
+        <input id="custEmail" class="info-input" />
+      </div>
+      <div class="info-field">
+        <label class="info-label">Street Address</label>
+        <input id="custStreet" class="info-input" />
+      </div>
+      <div class="info-field">
+        <label class="info-label">City/State</label>
+        <input id="custCity" class="info-input" />
+      </div>
+      <div class="info-field">
+        <label class="info-label">ZIP Code</label>
+        <input id="custZip" class="info-input" />
+      </div>
+    </div>
+
+    <!-- Technician Info -->
+    <div class="info-grid three-col">
+      <div class="info-field">
+        <label class="info-label">Technician Name</label>
+        <input id="techName" class="info-input" />
+      </div>
+      <div class="info-field">
+        <label class="info-label">Technician Phone</label>
+        <input id="techPhone" class="info-input" />
+      </div>
+      <div class="info-field">
+        <label class="info-label">Technician Email</label>
+        <input id="techEmail" class="info-input" />
+      </div>
+    </div>
+
+  </div> <!-- END job-info -->
+</div> <!-- END jobInfoPage -->
+
+
+<!-- Quote SECTION -->
+<div class="section-band">
+  <div class="section-band-title">Invoice</div>
+</div>
+
+<div class="section" id="itemsSection">
+  <div id="itemsList">
+
+<div class="item-row">
+  <textarea class="item-desc" placeholder="Item description..."></textarea>
+  <input class="item-qty" type="number" min="1" value="1">
+  <input class="item-unit" type="text" placeholder="Unit cost">
+  <input class="item-ext" type="text" placeholder="Total" readonly>
+  <button class="item-remove">×</button>
+</div>
+
+  </div>
+
+  <button id="addItemBtn" class="add-row-btn">+ Add invoice item</button>
+</div>
+
+<div id="quoteTotalRow" class="quote-total-row">
+  <span class="quote-total-label">Grand Total:</span>
+  <span id="quoteGrandTotal" class="quote-total-value">$0.00</span>
+</div>
+
+<div id="quoteExpiration" class="quote-disclaimer"></div>
+
+  <!-- SIGNATURES -->
+<div class="section-band">
+  <div class="section-band-title">Signatures</div>
+</div>
+
+<div class="section signatures">
+  <div class="signature-grid">
+    <div class="signature-block">
+      <div class="signature-label">Technician Signature</div>
+      <canvas id="sigTech" class="signature-pad"></canvas>
+      <button class="small-btn" data-clear="sigTech">Clear</button>
+    </div>
+
+    <div class="signature-block">
+      <div class="signature-label">Customer Signature</div>
+      <canvas id="sigCust" class="signature-pad"></canvas>
+      <button class="small-btn" data-clear="sigCust">Clear</button>
+    </div>
+  </div>
+</div>
+<!-- PDF CAPTURE AREA END -->
+
+      <div class="actions">
+        <button id="resetBtn" class="btn btn-secondary">Reset</button>
+        <button id="pdfBtn" class="btn btn-primary">Generate PDF</button>
+        <button id="emailBtn" class="btn btn-primary">Email PDF</button>
+      </div>
+    
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+/* ============================================================
+   STORAGE
+============================================================ */
+
+const STORAGE_KEY = "totalLine_inspection_v1";
+
+function loadState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  return raw ? JSON.parse(raw) : { job:{}, statuses:{}, notes:{} };
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+}
+
+let appState = loadState();
+
+/* ============================================================
+   JOB INFO
+============================================================ */
+
+const jobFields = [
+  "custName","custStreet","custCity","custZip",
+  "custPhone","custEmail",
+  "techName","techPhone","techEmail"
+];
+
+function loadJobInfo() {
+  jobFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (appState.job[id] !== undefined) el.value = appState.job[id];
+  });
+}
+
+function bindJobInfo() {
+  jobFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", () => {
+      appState.job[id] = el.value;
+      saveState();
+    });
+  });
+}
+
+/* ============================================================
+   SIGNATURES
+============================================================ */
+
+function initSignaturePads() {
+  ["sigTech","sigCust"].forEach(id => {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    let drawing = false;
+
+    canvas.addEventListener("pointerdown", e => {
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener("pointermove", e => {
+      if (!drawing) return;
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+    });
+
+    canvas.addEventListener("pointerup", () => drawing = false);
+    canvas.addEventListener("pointerleave", () => drawing = false);
+  });
+
+  document.querySelectorAll("[data-clear]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-clear");
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+    });
+  });
+}
+
+/* ============================================================
+   PDF + EMAIL
+============================================================ */
+
+function pdfOptions(filename) {
+  return {
+    margin: 10,
+    filename,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+    jsPDF: { unit: "pt", format: "letter", orientation: "portrait" },
+    pagebreak: { mode: ["css"] }
+  };
+}
+
+function buildPdfName() {
+  const phone = (document.getElementById("custPhone").value || "")
+    .replace(/\D/g,"") || "no-phone";
+
+  const name = (document.getElementById("custName").value || "no-name")
+    .trim().replace(/\s+/g,"_");
+
+  const d = new Date();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  const yyyy = d.getFullYear();
+
+  return `${phone}_${name}_${yyyy}${mm}${dd}.pdf`;
+}
+
+function openPrefilledEmail(pdfName, to) {
+  const cc = "a2zproservices@gmail.com";
+  const subject = encodeURIComponent("Garage Door Inspection Report");
+  const body = encodeURIComponent("Attached is your inspection report.\n\n");
+
+  window.location.href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
+
+  const picker = document.getElementById("attachPicker");
+  if (picker) setTimeout(() => picker.click(), 800);
+}
+
+/* ============================================================
+   DOM READY
+============================================================ */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  loadJobInfo();
+  bindJobInfo();
+  initSignaturePads();
+
+  /* ============================================================
+     DATE + EXPIRATION
+  ============================================================ */
+
+  const quoteDateEl = document.getElementById("quoteDate");
+  if (quoteDateEl) {
+    const d = new Date();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate(), "0");
+    const yyyy = d.getFullYear();
+    quoteDateEl.textContent = `${mm}/${dd}/${yyyy}`;
+  }
+
+  const expEl = document.getElementById("quoteExpiration");
+  if (expEl) {
+    const d = new Date();
+    d.setDate(d.getDate() + 14);
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    expEl.textContent = `Payment due upon receipt`;
+  }
+
+  /* ============================================================
+   QUOTE SECTION (5‑column system)
+============================================================ */
+
+function formatCurrency(value) {
+  if (value == null) return "";
+  value = String(value); // Safari fix
+  const num = parseFloat(value.replace(/[^0-9.-]/g, ""));
+  if (isNaN(num)) return "";
+  return num.toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
+function parseCurrency(value) {
+  if (value == null) return 0;
+  value = String(value); // Safari fix
+  return parseFloat(value.replace(/[^0-9.-]/g, "")) || 0;
+}
+
+function updateExtended(row) {
+  const qty = parseFloat(row.querySelector(".item-qty").value) || 0;
+  const unit = parseCurrency(row.querySelector(".item-unit").value);
+  const ext = qty * unit;
+  row.querySelector(".item-ext").value = formatCurrency(ext);
+}
+
+function updateGrandTotal() {
+  let total = 0;
+  document.querySelectorAll(".item-ext").forEach(ext => {
+    total += parseCurrency(ext.value);
+  });
+  document.getElementById("quoteGrandTotal").textContent =
+    total.toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
+// Handle qty + unit cost changes
+document.addEventListener("input", (e) => {
+  const row = e.target.closest(".item-row");
+  if (!row) return;
+
+  if (
+    e.target.classList.contains("item-qty") ||
+    e.target.classList.contains("item-unit")
+  ) {
+    updateExtended(row);
+    updateGrandTotal();
+  }
+});
+
+// Format currency ONLY on blur
+document.addEventListener("blur", (e) => {
+  if (e.target.classList.contains("item-unit")) {
+    e.target.value = formatCurrency(e.target.value);
+    const row = e.target.closest(".item-row");
+    updateExtended(row);
+    updateGrandTotal();
+  }
+}, true);
+
+// Add new row
+document.getElementById("addItemBtn").addEventListener("click", () => {
+  const list = document.getElementById("itemsList");
+
+  const row = document.createElement("div");
+  row.className = "item-row";
+  row.innerHTML = `
+    <textarea class="item-desc" placeholder="Item description..."></textarea>
+    <input class="item-qty" type="number" min="1" value="1">
+    <input class="item-unit" placeholder="Unit cost">
+    <input class="item-ext" placeholder="Total" readonly>
+    <button class="item-remove">×</button>
+  `;
+
+  list.appendChild(row);
+});
+
+// Remove row
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("item-remove")) {
+    e.target.closest(".item-row").remove();
+    updateGrandTotal();
+  }
+});
+
+  /* ============================================================
+     PDF BUTTON
+  ============================================================ */
+
+  const pdfBtn = document.getElementById("pdfBtn");
+  const actionsBar = document.querySelector(".actions");
+
+  if (pdfBtn) {
+    pdfBtn.addEventListener("click", () => {
+      const pdfName = buildPdfName();
+      const el = document.getElementById("pdfCaptureArea");
+
+      actionsBar.classList.add("no-print");
+
+      html2pdf()
+        .set(pdfOptions(pdfName))
+        .from(el)
+        .save()
+        .then(() => {
+          actionsBar.classList.remove("no-print");
+        });
+    });
+  }
+
+  /* ============================================================
+     EMAIL PDF BUTTON
+  ============================================================ */
+
+  const emailBtn = document.getElementById("emailBtn");
+  if (emailBtn) {
+    emailBtn.addEventListener("click", () => {
+      const pdfName = buildPdfName();
+      const to = document.getElementById("custEmail").value || "";
+      const el = document.getElementById("pdfCaptureArea");
+
+      actionsBar.classList.add("no-print");
+
+      html2pdf()
+        .set(pdfOptions(pdfName))
+        .from(el)
+        .outputPdf("blob")
+        .then((blob) => {
+          actionsBar.classList.remove("no-print");
+
+          const url = URL.createObjectURL(blob);
+          const iframe = document.createElement("iframe");
+          iframe.style.display = "none";
+          iframe.src = url;
+          document.body.appendChild(iframe);
+
+          setTimeout(() => {
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = pdfName;
+            link.click();
+
+            setTimeout(() => {
+              document.body.removeChild(iframe);
+              URL.revokeObjectURL(url);
+            }, 500);
+
+            setTimeout(() => openPrefilledEmail(pdfName, to), 600);
+          }, 200);
+        });
+    });
+  }
+
+  /* ============================================================
+     RESET BUTTON
+  ============================================================ */
+
+  const resetBtn = document.getElementById("resetBtn");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    });
+  }
+
+});
+</script>
+
+<input type="file" id="attachPicker" style="display:none" />
+</body>
+</html>
+
