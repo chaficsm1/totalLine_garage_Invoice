@@ -731,7 +731,7 @@ function buildPdfName() {
   const dd = String(d.getDate()).padStart(2,"0");
   const yyyy = d.getFullYear();
 
-  return `${phone}_${name}_${yyyy}${mm}${dd}.pdf`;
+  return `${phone}_${name}_${yyyy}${mm}${dd}_Invoice.pdf`;
 }
 
 function openPrefilledEmail(pdfName, to) {
