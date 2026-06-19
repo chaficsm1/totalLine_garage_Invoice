@@ -737,7 +737,7 @@ function buildPdfName() {
 function openPrefilledEmail(pdfName, to) {
   const cc = "a2zproservices@gmail.com";
   const subject = encodeURIComponent("Invoice");
-  const body = encodeURIComponent("Attached is your inspection report.\n\n");
+  const body = encodeURIComponent("Attached is your invoice.\n\n");
 
   window.location.href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
 
