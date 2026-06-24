@@ -1,0 +1,385 @@
+/* ============================================================
+   ROOT VARIABLES
+============================================================ */
+:root {
+  --brand-blue: #0066cc;
+  --pass-green: #2e7d32;
+  --fail-red: #c62828;
+  --na-gray: #9e9e9e;
+  --border-light: #e0e0e0;
+  --note-border: #bbdefb;
+  --bg-light: #fafafa;
+  --text-main: #212121;
+  --text-muted: #616161;
+}
+
+/* ============================================================
+   GLOBAL RESET
+============================================================ */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #ffffff;
+  color: var(--text-main);
+}
+
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0 0.75rem;
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.header-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--brand-blue);
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.header-company {
+  font-size: 14px;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.company-line {
+  font-weight: 500;
+}
+
+.header-divider {
+  height: 1px;
+  background: var(--border-light);
+  margin-bottom: 0.75rem;
+}
+
+/* ============================================================
+   JOB INFO
+============================================================ */
+.job-info {
+  background: #f9fafc;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #d0d7de;
+}
+
+.job-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.info-grid.three-col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.info-grid.two-col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.info-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.info-input {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+  background: #ffffff;
+}
+
+/* ============================================================
+   SECTION BANDS
+============================================================ */
+.section-band {
+  background: #eef6ff;
+  border-left: 4px solid var(--brand-blue);
+  padding: 0.6rem 0.8rem;
+  margin: 1rem 0 0.6rem;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.section-band-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #003f80;
+  pointer-events: auto;
+}
+
+/* ============================================================
+   Invoice ITEM ROWS
+============================================================ */
+.item-row {
+  display: grid;
+  grid-template-columns: 2fr 0.6fr 0.8fr 0.8fr 40px;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.item-desc {
+  width: 100%;
+  min-height: 50px;
+  padding: 8px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+}
+
+.item-qty,
+.item-unit,
+.item-ext {
+  width: 100%;
+  height: 50px;
+  padding: 8px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.item-ext {
+  background: #f3f3f3;
+  font-weight: bold;
+}
+
+.item-unit {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  caret-color: auto !important;
+}
+
+.item-remove {
+  background: none;
+  border: none;
+  color: #d11a1a;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+/* ============================================================
+   ADD ROW BUTTON
+============================================================ */
+.add-row-btn {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* ============================================================
+   TOTALS + DISCLAIMERS
+============================================================ */
+.invoice-total-row {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 2px solid #ccc;
+  display: flex;
+  justify-content: flex-end;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.invoice-total-label {
+  margin-right: 10px;
+}
+
+.invoice-total-value {
+  min-width: 120px;
+  text-align: right;
+}
+
+.invoice-disclaimer {
+  margin-top: 20px;
+  font-size: 14px;
+  font-style: italic;
+  color: #444;
+}
+
+/* ============================================================
+   SIGNATURES
+============================================================ */
+.signatures {
+  margin-top: 1.5rem;
+  padding-top: 0.75rem;
+  border-top: 2px solid var(--border-light);
+}
+
+.signature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.signature-block {
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: var(--bg-light);
+}
+
+.signature-label {
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+  color: var(--text-muted);
+}
+
+canvas.signature-pad {
+  width: 100%;
+  height: 140px;
+  border-radius: 6px;
+  border: 1px dashed #bdbdbd;
+  background: #ffffff;
+  touch-action: none;
+}
+
+.small-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  background: #e0e0e0;
+  color: #424242;
+  margin-top: 0.35rem;
+}
+
+/* ============================================================
+   ACTION BUTTONS
+============================================================ */
+.actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-bottom: 1.5rem;
+}
+
+.btn {
+  border-radius: 999px;
+  border: none;
+  padding: 0.55rem 1.3rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--brand-blue);
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background: #eeeeee;
+  color: #424242;
+}
+
+/* ============================================================
+   MOBILE
+============================================================ */
+@media (max-width: 600px) {
+  .item-row {
+    grid-template-columns: 1fr;
+  }
+
+  .info-grid.three-col,
+  .info-grid.two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   PRINT HELPERS
+============================================================ */
+.no-print {
+  display: none !important;
+}
+
+.icon-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.icon-callout .icon {
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--brand-blue);
+}
+
+.icon-callout .text {
+  flex: 1;
+}
+
+
